@@ -1,0 +1,52 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="{{url_for('static', filename='styles.css')}}">
+</head>
+
+<head>
+    <title>Sign Up</title>
+    <script>
+        function validateForm() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirm_password").value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match! Please try again.");
+                return false;  // 阻止表单提交
+            }
+        }
+        // 3秒后自动跳转
+        function redirectToLogin() {
+            setTimeout(function() {
+                window.location.href = "/";
+            }, 3000); // 3秒后跳转
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Sign Up</h2>
+
+        <!-- 显示 Flash 消息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message|safe }}</div>
+                    {% endfor %}
+                </div>
+                <script>redirectToLogin();</script> <!-- 成功注册后 3 秒后跳转 -->
+            {% endif %}
+        {% endwith %}
+
+        <form action="/signup" method="post" onsubmit="return validateForm()">
+            <p><label>Username: <input type="text" id="username" name="username" required></label></p>
+            <p><label>Password: <input type="password" id="password" name="password" required></label></p>
+            <p><label>Confirm Password: <input type="password" id="confirm_password" name="confirm_password" required></label></p>
+            <p><input type="submit" value="Sign Up"></p>
+        </form>
+        <p>Already have an account? <a href="/">Log in</a></p>
+    </div>
+</body>
+</html>

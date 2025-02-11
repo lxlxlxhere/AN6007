@@ -1,0 +1,22 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="{{url_for('static', filename='styles.css')}}">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Electricity Usage</h2>
+
+        <p>Meter ID: {{ meter_id }}</p>
+        <p>Current Usage: {{ usage }} kWh</p>
+
+        <form action="/supplier_result" method="post">
+            <input type="hidden" name="meter_id" value="{{ meter_id }}">
+            <p><input type="submit" value="Refresh"></p>
+        </form>
+
+        <form action="/supplier" method="get">
+            <p><input type="submit" value="Back"></p>
+        </form>
+    </div> 
+</body>

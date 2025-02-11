@@ -1,0 +1,21 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="{{url_for('static', filename='styles.css')}}">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Electricity Usage</h2>
+
+        <p>Your current electricity consumption:</p>
+        <h1>{{ usage }} kWh</h1>
+
+        <form action="/user_meter" method="get">
+            <p><input type="submit" value="Refresh"></p>
+        </form>
+
+        <form action="/main" method="get">
+            <p><input type="submit" value="Back"></p>
+        </form>
+    </div> 
+</body>

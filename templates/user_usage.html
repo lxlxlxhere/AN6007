@@ -1,0 +1,33 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="{{url_for('static', filename='styles.css')}}">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Electricity Usage</h2>
+
+        <p>Recent 30 minutes consumption:</p>
+        <h1>{{ recent_half_hour_usage }} kWh</h1>
+
+        <p>Today's consumption:</p>
+        <h1>{{ today_usage }} kWh</h1>
+
+        <p>This week's consumption:</p>
+        <h1>{{ week_usage }} kWh</h1>
+
+        <p>This month's consumption:</p>
+        <h1>{{ month_usage }} kWh</h1>
+
+        <p>Last month's consumption:</p>
+        <h1>{{ last_month_usage }} kWh</h1>
+
+        <form action="/user_usage" method="get">
+            <p><input type="submit" value="Refresh"></p>
+        </form>
+
+        <form action="/main" method="get">
+            <p><input type="submit" value="Back"></p>
+        </form>
+    </div>
+</body>

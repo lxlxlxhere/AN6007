@@ -1,0 +1,22 @@
+{
+    "user1": {
+        "meter_id": "100000001",
+        "password": "1111"
+    },
+    "user2": {
+        "meter_id": "100000002",
+        "password": "2222"
+    },
+    "user3": {
+        "meter_id": "100000003",
+        "password": "3333"
+    },
+    "user4": {
+        "meter_id": "100000004",
+        "password": "4444"
+    },
+    "user5": {
+        "meter_id": "100000005",
+        "password": "5555"
+    }
+}
