@@ -52,3 +52,25 @@
 [2025-02-12 15:50:29] GET /user_meter - Params: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 0.0}
 [2025-02-12 15:50:30] GET /user_meter - Params: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 0.0}
 [2025-02-12 15:50:33] GET /user_meter - Params: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.72411738}
+[2025-02-12 17:11:48] GET / - Request: None - Response: {"page": "usertype.html"}
+[2025-02-12 17:11:49] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-12 17:11:53] POST /login - Request: {'username': 'user1'} - Response: {"success": true, "username": "user1"}
+[2025-02-12 17:11:54] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-12 17:11:54] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.92709083}
+[2025-02-12 17:11:55] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.92744582}
+[2025-02-12 17:11:59] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.92816344}
+[2025-02-12 17:12:11] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.93114327}
+[2025-02-12 17:12:12] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.93143968}
+[2025-02-12 17:15:40] GET / - Request: None - Response: {"page": "usertype.html"}
+[2025-02-12 17:15:42] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-12 17:15:46] POST /login - Request: {'username': 'user1'} - Response: {"success": true, "username": "user1"}
+[2025-02-12 17:15:46] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-12 17:15:47] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.94557635}
+[2025-02-12 17:15:48] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.94586426}
+[2025-02-12 17:17:34] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.96824326}
+[2025-02-12 17:17:36] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.96859684}
+[2025-02-12 17:17:40] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": "Server under maintenance..."}
+[2025-02-12 17:17:41] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": "Server under maintenance..."}
+[2025-02-12 17:17:43] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": "Server under maintenance..."}
+[2025-02-12 17:17:45] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.97107124}
+[2025-02-12 17:17:46] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.97140632}

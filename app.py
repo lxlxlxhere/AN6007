@@ -19,7 +19,7 @@ meter_manager = MeterManager()
 def log_request(method, endpoint, params=None, response_data=None):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    log_message = f"[{timestamp}] {method} {endpoint} - Params: {params} - Response: {json.dumps(response_data)}\n"
+    log_message = f"[{timestamp}] {method} {endpoint} - Request: {params} - Response: {json.dumps(response_data)}\n"
     
     with open("log.txt", "a") as log_file:
         log_file.write(log_message)

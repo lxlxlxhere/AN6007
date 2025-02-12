@@ -13,13 +13,8 @@ def read_meter_data(meter_id):
 
     meter_file = os.path.join(METERS_FOLDER, f"meter_{meter_id}.txt")
 
-    try:
-        with open(meter_file, "r") as f:
-            return float(f.read().strip())
-    except FileNotFoundError:
-        return {"error": "Meter data not found"}
-    except ValueError:
-        return {"error": "Invalid meter data"}
+    with open(meter_file, "r") as f:
+        return float(f.read().strip())
 
 
 @app.route("/get_meter_data/<meter_id>", methods=["GET"])
@@ -29,7 +24,10 @@ def get_meter_data(meter_id):
 
     global acceptAPI
     if not acceptAPI:
-        return jsonify({"success": False, "message": "Server under maintenance..."}), 503
+            return jsonify({
+                "meter_id": meter_id,
+                "reading_kwh": "Server under maintenance..."
+            })
 
     return jsonify({
         "meter_id": meter_id,

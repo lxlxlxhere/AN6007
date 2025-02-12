@@ -10,7 +10,7 @@ class MeterManager:
     def get_meter_reading(self, meter_id):
         response = requests.get(f"{METER_API_URL}{meter_id}")
         data = response.json()
-        return float(data.get("reading_kwh", 0))
+        return (data.get("reading_kwh", 0))
 
     def get_user_usage(self, meter_id):
         df_daily = pd.read_csv(DAILY_CSV_FILE)
