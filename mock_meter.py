@@ -14,27 +14,29 @@ def load_users():
             return json.load(f)
     return {}
 
+# 读取或创建电表读数 txt
 def load_total_kwh(meter_file):
-    """ 读取该电表的最新总用电量（如果文件不存在，则返回 0.0） """
+
     try:
         with open(meter_file, "r") as f:
-            return float(f.read().strip())  # 读取唯一的一行数值
+            return float(f.read().strip())
     except:
-        return 0.0  # 默认从 0 开始
+        return 0.0  # 否则返回 0.0
 
+# 覆写电表读数
 def save_total_kwh(meter_file, kwh):
-    """ 覆盖写入新的总用电量 """
-    with open(meter_file, "w") as f:
-        f.write(f"{kwh:.8f}")  # 直接覆盖旧数据，只存储一个数字
 
+    with open(meter_file, "w") as f:
+        f.write(f"{kwh:.8f}")  # 直接覆盖旧数据
+
+# 随机生成电量消耗
 def get_next_usage():
-    """ 生成符合现实情况的随机用电量 """
+
     return round(random.uniform(0.1, 1.5)/3600, 8)
 
 def run_meters():
-    """ 为所有注册用户的电表定时更新数据，并支持新注册用户 """
     
-    os.makedirs(METERS_FOLDER, exist_ok=True)  # 确保 meters_data 目录存在
+    os.makedirs(METERS_FOLDER, exist_ok=True)
     print("Mock Meter started...\n")
 
     while True:
