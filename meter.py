@@ -23,7 +23,11 @@ class MeterManager:
         prev_month_end = (now.replace(day=1) - timedelta(days=1)).replace(day=1).strftime("%Y-%m-%d")
         
         df_valid = df_today.dropna(subset=[meter_id])
-        recent_half_hour_usage = df_valid[meter_id].iloc[-1] - df_valid[meter_id].iloc[-2]
+        # 在 1:30 之前，可用数据仅有一行，会无法生成过去半小时的数据，因此直接返回0.0
+        if df_valid[meter_id].shape[0] < 2:
+            recent_half_hour_usage = 0.0
+        else:
+            recent_half_hour_usage = df_valid[meter_id].iloc[-1] - df_valid[meter_id].iloc[-2]
 
         today_usage = self.get_meter_reading(meter_id) - df_daily[df_daily["date"] == yesterday][meter_id].values[0]
         week_usage = self.get_meter_reading(meter_id) - df_daily[df_daily["date"] == last_weekend][meter_id].values[0]

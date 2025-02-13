@@ -95,3 +95,16 @@
 [2025-02-13 01:20:31] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": "Server under maintenance..."}
 [2025-02-13 01:20:33] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.70684635}
 [2025-02-13 01:20:34] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.70709311}
+[2025-02-13 01:28:45] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:46] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:47] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:47] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:48] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:48] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:49] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:28:50] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:28:51] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:33:02] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:33:05] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
+[2025-02-13 01:33:07] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
+[2025-02-13 01:33:07] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
