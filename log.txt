@@ -108,3 +108,51 @@
 [2025-02-13 01:33:05] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
 [2025-02-13 01:33:07] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
 [2025-02-13 01:33:07] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
+[2025-02-13 01:34:36] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
+[2025-02-13 01:34:37] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:50:40] GET /main - Request: {'username': None} - Response: {"username": null, "meter_id": "N/A"}
+[2025-02-13 01:50:48] POST /logout - Request: {'username': None} - Response: {"success": true, "username": null}
+[2025-02-13 01:50:48] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:50:54] POST /login - Request: {'username': 'user1'} - Response: {"success": true, "username": "user1"}
+[2025-02-13 01:50:54] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:50:55] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:51:02] POST /logout - Request: {'username': 'user1'} - Response: {"success": true, "username": "user1"}
+[2025-02-13 01:51:02] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:51:34] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:51:37] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:51:39] POST /login - Request: {'username': 'hyx'} - Response: {"error": "Invalid username or password"}
+[2025-02-13 01:51:39] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:51:44] GET /user_usage - Request: {'meter_id': '100000001'} - Response: {"recent_half_hour_usage": 0.07, "today_usage": 1.6, "week_usage": 9.75, "month_usage": 66.71, "last_month_usage": 111.41}
+[2025-02-13 01:51:50] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:52:00] POST /login - Request: {'username': '100000001'} - Response: {"error": "Invalid username or password"}
+[2025-02-13 01:52:00] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:52:08] GET /signup - Request: None - Response: {"page": "signup.html"}
+[2025-02-13 01:52:18] POST /signup - Request: {'username': '100000001'} - Response: {"success": true, "username": "100000001"}
+[2025-02-13 01:52:18] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:52:19] POST /logout - Request: {'username': 'user1'} - Response: {"success": true, "username": "user1"}
+[2025-02-13 01:52:19] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:52:27] POST /login - Request: {'username': '100000001'} - Response: {"success": true, "username": "100000001"}
+[2025-02-13 01:52:27] GET /main - Request: {'username': '100000001'} - Response: {"username": "100000001", "meter_id": "100000006"}
+[2025-02-13 01:52:38] GET / - Request: None - Response: {"page": "usertype.html"}
+[2025-02-13 01:53:49] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:54:06] GET /signup - Request: None - Response: {"page": "signup.html"}
+[2025-02-13 01:54:19] POST /signup - Request: {'username': '123'} - Response: {"success": true, "username": "123"}
+[2025-02-13 01:54:19] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:54:33] POST /login - Request: {'username': '123'} - Response: {"success": true, "username": "123"}
+[2025-02-13 01:54:33] GET /main - Request: {'username': '123'} - Response: {"username": "123", "meter_id": "100000007"}
+[2025-02-13 01:55:18] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:55:28] POST /login - Request: {'username': '123'} - Response: {"success": true, "username": "123"}
+[2025-02-13 01:55:29] GET /main - Request: {'username': '123'} - Response: {"username": "123", "meter_id": "100000007"}
+[2025-02-13 01:55:49] POST /logout - Request: {'username': '123'} - Response: {"success": true, "username": "123"}
+[2025-02-13 01:55:49] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:55:56] GET /main - Request: {'username': '123'} - Response: {"username": "123", "meter_id": "100000007"}
+[2025-02-13 01:57:12] GET / - Request: None - Response: {"page": "usertype.html"}
+[2025-02-13 01:57:14] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 01:57:19] POST /login - Request: {'username': 'user1'} - Response: {"success": true, "username": "user1"}
+[2025-02-13 01:57:19] GET /main - Request: {'username': 'user1'} - Response: {"username": "user1", "meter_id": "100000001"}
+[2025-02-13 01:57:20] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 01:57:21] GET /user_meter - Request: {'meter_id': '100000001'} - Response: {"meter_id": "100000001", "usage_kwh": 518.71409203}
+[2025-02-13 02:06:14] GET /login - Request: None - Response: {"page": "login.html"}
+[2025-02-13 02:06:16] GET / - Request: None - Response: {"page": "usertype.html"}
+[2025-02-13 02:12:16] GET / - Request: None - Response: {"page": "usertype.html"}
+[2025-02-13 02:13:38] GET / - Request: None - Response: {"page": "usertype.html"}

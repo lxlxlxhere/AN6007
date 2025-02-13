@@ -105,6 +105,27 @@ def user_usage():
     log_request("GET", "/user_usage", {"meter_id": meter_id}, usage_data)
     return render_template("user_usage.html", **usage_data)
 
+# ——————————————————————————————————————————
+
+@app.route("/supplier", methods=["GET", "POST"])
+def supplier():
+    return render_template("supplier.html")
+
+@app.route("/supplier_result", methods=["POST"])
+def supplier_result():
+    meter_id = request.form["meter_id"]  # 获取输入的电表 ID
+    usage_value = meter_manager.get_meter_reading(meter_id)  # 通过 API 获取电表数据
+
+    return render_template("supplier_result.html", meter_id=meter_id, usage=usage_value)
+
+# ——————————————————————————————————————————
+
+@app.route("/administrator")
+def administrator():
+    pass
+
+# ——————————————————————————————————————————
+
 @app.route("/logout", methods=["POST"])
 def logout():
     username = session.get("username")
