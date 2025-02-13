@@ -11,18 +11,17 @@ from user import UserManager
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
-# 实例化管理类
 user_manager = UserManager()
 meter_manager = MeterManager()
 
-# 日志记录函数
+# 日志
 def log_request(method, endpoint, params=None, response_data=None):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    log_message = f"[{timestamp}] {method} {endpoint} - Request: {params} - Response: {json.dumps(response_data)}\n"
+    log_record = f"[{timestamp}] {method} {endpoint} - Request: {params} - Response: {json.dumps(response_data)}\n"
     
     with open("log.txt", "a") as log_file:
-        log_file.write(log_message)
+        log_file.write(log_record)
 
 # ——————————————————————————————————————————
 
