@@ -32,7 +32,7 @@ def save_total_kwh(meter_file, kwh):
 # 随机生成电量消耗
 def get_next_usage():
 
-    return round(random.uniform(0.1, 1.5)/3600, 8)
+    return round(random.uniform(0.1, 1.0)/1000000, 8)
 
 def run_meters():
     

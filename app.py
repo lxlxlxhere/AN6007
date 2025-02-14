@@ -14,21 +14,11 @@ app.secret_key = "secret_key"
 user_manager = UserManager()
 meter_manager = MeterManager()
 
-# 日志
-def log_request(method, endpoint, params=None, response_data=None):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    log_record = f"[{timestamp}] {method} {endpoint} - Request: {params} - Response: {json.dumps(response_data)}\n"
-    
-    with open("log.txt", "a") as log_file:
-        log_file.write(log_record)
-
 # ——————————————————————————————————————————
 
 @app.route('/')
 def usertype():
     response_data = {"page": "usertype.html"}
-    log_request("GET", "/", response_data=response_data)
     return render_template('usertype.html')
 
 @app.route("/login", methods=["GET", "POST"])
@@ -40,17 +30,14 @@ def login():
         if not user_manager.validate_user(username, password):
             flash("Invalid username or password!", "error")
             response_data = {"error": "Invalid username or password"}
-            log_request("POST", "/login", {"username": username}, response_data)
             return redirect(url_for("login"))
 
         session["username"] = username
         session["meter_id"] = user_manager.get_meter_id(username)
         response_data = {"success": True, "username": username}
-        log_request("POST", "/login", {"username": username}, response_data)
         return redirect(url_for("main"))
 
     response_data = {"page": "login.html"}
-    log_request("GET", "/login", response_data=response_data)
     return render_template("login.html")
 
 @app.route("/main", methods=["GET"])
@@ -58,7 +45,6 @@ def main():
     username = session.get("username")
     meter_id = session.get("meter_id", "N/A")
     response_data = {"username": username, "meter_id": meter_id}
-    log_request("GET", "/main", {"username": username}, response_data)
     return render_template("main.html", username=username, meter_id=meter_id)
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -71,22 +57,18 @@ def signup():
         if password != confirm_password:
             flash("Passwords do not match!", "error")
             response_data = {"error": "Passwords do not match"}
-            log_request("POST", "/signup", {"username": username}, response_data)
             return redirect(url_for("signup"))
 
         if user_manager.add_user(username, password):
             flash("Sign up successful!", "success")
             response_data = {"success": True, "username": username}
-            log_request("POST", "/signup", {"username": username}, response_data)
             return redirect(url_for("login"))
         else:
             flash("Username already exists!", "error")
             response_data = {"error": "Username already exists"}
-            log_request("POST", "/signup", {"username": username}, response_data)
             return redirect(url_for("signup"))
 
     response_data = {"page": "signup.html"}
-    log_request("GET", "/signup", response_data=response_data)
     return render_template("signup.html")
 
 @app.route("/user_meter", methods=["GET"])
@@ -95,15 +77,24 @@ def user_meter():
     meter_id = session.get("meter_id")
     usage_value = meter_manager.get_meter_reading(meter_id)
     response_data = {"meter_id": meter_id, "usage_kwh": usage_value}
-    log_request("GET", "/user_meter", {"meter_id": meter_id}, response_data)
     return render_template("user_meter.html", usage=usage_value)
 
+# 访问 user_usage.html 前先检查 acceptAPI 状态
 @app.route("/user_usage", methods=["GET"])
 def user_usage():
-    meter_id = session.get("meter_id")
-    usage_data = meter_manager.get_user_usage(meter_id)
-    log_request("GET", "/user_usage", {"meter_id": meter_id}, usage_data)
-    return render_template("user_usage.html", **usage_data)
+
+    response = requests.get("http://127.0.0.1:5002/api/server_status")
+    
+    if response.status_code == 200 and response.json().get("acceptAPI", False):
+        meter_id = session.get("meter_id")
+        usage_data = meter_manager.get_user_usage(meter_id)
+        return render_template("user_usage.html", **usage_data)
+    else:
+        return redirect("/server_busy")  # **如果 `acceptAPI = False`，跳转到 `server_busy.html`**
+
+@app.route("/server_busy", methods=["GET"])
+def server_busy():
+    return render_template("server_busy.html")
 
 # ——————————————————————————————————————————
 
@@ -131,7 +122,6 @@ def logout():
     username = session.get("username")
     session.clear()
     response_data = {"success": True, "username": username}
-    log_request("POST", "/logout", {"username": username}, response_data)
     return redirect(url_for("login"))
 
 if __name__ == "__main__":

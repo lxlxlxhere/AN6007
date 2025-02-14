@@ -57,7 +57,7 @@ def ensure_csv_structure():
     meter_ids = [data["meter_id"] for data in users.values()]
 
     # 生成 01:00 - 23:30，每隔 30 分钟的时间戳
-    time_stamps = pd.date_range(start="01:00", end="23:30", freq="30T").strftime("%H:%M").tolist()
+    time_stamps = pd.date_range(start="01:00", end="23:30", freq="30min").strftime("%H:%M").tolist()
 
     if not os.path.exists(TODAY_CSV_FILE):
         df = pd.DataFrame({"date": [today] * len(time_stamps), "timestamp": time_stamps})
