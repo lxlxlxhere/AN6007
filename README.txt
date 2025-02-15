@@ -5,4 +5,4 @@ The execution order is as follows:
 3. store_readings.py
 4. app.py
 
-"_original" means that it is the last version.
+"_original" means that it is the last version, used only as a backup.
