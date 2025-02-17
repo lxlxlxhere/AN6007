@@ -1,31 +1,92 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet"  href="{{url_for('static', filename='styles.css')}}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Load Chart.js -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
     <div class="container">
         <h2>Electricity Usage</h2>
 
-        <p>Recent 30 minutes consumption:</p>
-        <h1>{{ recent_half_hour_usage }} kWh</h1>
+        <!-- Bar Chart: Recent Usage -->
+        <h3>Recent Consumption</h3>
+        <canvas id="barChart"></canvas>
 
-        <p>Today's consumption:</p>
-        <h1>{{ today_usage }} kWh</h1>
+        <!-- Line Chart: Historical Trends (Last 7 Days) -->
+        <h3>Past 7 Days Usage</h3>
+        <canvas id="lineChart"></canvas>
 
-        <p>This week's consumption:</p>
-        <h1>{{ week_usage }} kWh</h1>
+        <!-- Pie Chart: Consumption Breakdown -->
+        <h3>Consumption Breakdown</h3>
+        <canvas id="pieChart"></canvas>
 
-        <p>This month's consumption:</p>
-        <h1>{{ month_usage }} kWh</h1>
+        <script>
+            // Bar Chart - Recent Usage
+            var ctxBar = document.getElementById('barChart').getContext('2d');
+            var barChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Recent 30 min', 'Today', 'Week', 'Month', 'Last Month'],
+                    datasets: [{
+                        label: 'Electricity Consumption (kWh)',
+                        data: [
+                            {{ recent_half_hour_usage }},
+                            {{ today_usage }},
+                            {{ week_usage }},
+                            {{ month_usage }},
+                            {{ last_month_usage }}
+                        ],
+                        backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
 
-        <p>Last month's consumption:</p>
-        <h1>{{ last_month_usage }} kWh</h1>
+            // Line Chart - Last 7 Days Usage
+            var ctxLine = document.getElementById('lineChart').getContext('2d');
+            var lineChart = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: {{ historical_dates | tojson }},
+                    datasets: [{
+                        label: 'Daily Consumption (kWh)',
+                        data: {{ historical_usage | tojson }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Pie Chart - Consumption Breakdown
+            var ctxPie = document.getElementById('pieChart').getContext('2d');
+            var pieChart = new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['Today', 'Week', 'Month'],
+                    datasets: [{
+                        data: [{{ today_usage }}, {{ week_usage }}, {{ month_usage }}],
+                        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)']
+                    }]
+                }
+            });
+        </script>
 
         <form action="/user_usage" method="get">
             <p><input type="submit" value="Refresh"></p>
         </form>
-
         <form action="/main" method="get">
             <p><input type="submit" value="Back"></p>
         </form>

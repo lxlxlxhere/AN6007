@@ -122,6 +122,35 @@ def logout():
     session.clear()
     response_data = {"success": True, "username": username}
     return redirect(url_for("login"))
+# ——————————————————————————————————————————
+
+@app.route("/user_usage", methods=["GET"])
+def user_usage():
+    meter_id = session.get("meter_id")  # Get the logged-in user's meter ID
+
+    usage_data = meter_manager.get_user_usage(meter_id)  # Fetch current consumption data
+
+    # Fetch historical data (past 7 days)
+    historical_dates = []
+    historical_usage = []
+    
+    for i in range(7, 0, -1):  # Get last 7 days
+        date_str = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+        daily_usage = meter_manager.get_meter_data(meter_id, METER_DAILY_API, date_str)
+        if daily_usage:
+            historical_dates.append(date_str)
+            historical_usage.append(daily_usage)
+
+    return render_template(
+        "user_usage.html",
+        recent_half_hour_usage=usage_data["recent_half_hour_usage"],
+        today_usage=usage_data["today_usage"],
+        week_usage=usage_data["week_usage"],
+        month_usage=usage_data["month_usage"],
+        last_month_usage=usage_data["last_month_usage"],
+        historical_dates=historical_dates,
+        historical_usage=historical_usage
+    )
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
