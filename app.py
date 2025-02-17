@@ -7,7 +7,6 @@ from datetime import datetime
 from meter import MeterManager
 from user import UserManager
 
-# 创建 Flask 应用
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
@@ -104,8 +103,8 @@ def supplier():
 
 @app.route("/supplier_result", methods=["POST"])
 def supplier_result():
-    meter_id = request.form["meter_id"]  # 获取输入的电表 ID
-    usage_value = meter_manager.get_meter_reading(meter_id)  # 通过 API 获取电表数据
+    meter_id = request.form["meter_id"]
+    usage_value = meter_manager.get_meter_reading(meter_id)
 
     return render_template("supplier_result.html", meter_id=meter_id, usage=usage_value)
 

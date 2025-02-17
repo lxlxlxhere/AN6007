@@ -6,10 +6,13 @@ import requests
 import time
 import threading
 import schedule
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 from flask import Flask, jsonify, request
+from concurrent.futures import ThreadPoolExecutor
 
 METER_API_URL = "http://127.0.0.1:5001/get_meter_data/"
+METER_DATA_FOLDER = "meter_data"
 USERS_DATA_FILE = "users.json"
 TODAY_CSV = "electricity_data_today.csv"
 DAILY_CSV = "electricity_data_daily.csv"
@@ -21,9 +24,11 @@ data_daily = {}
 server_running = True
 
 app = Flask(__name__)
-
+executor = ThreadPoolExecutor(max_workers=5)
+# Use ThreadPoolExecutor to handle multiple requests concurrently
 
 # 读取所有已注册 meter_id ———————————————————————————————————————————————————————
+# Retrieve all registered meter_id
 def load_meter_ids():
 
     with open(USERS_DATA_FILE, "r") as f:
@@ -33,8 +38,10 @@ def load_meter_ids():
 
 
 # 每半小时读取数据 ---------------------------------------------------------------
+# Read data every half hour
 
 # 读取数据至 当日dic
+# Read data into today’s dic
 def fetch_meter_data():
 
     global data_today
@@ -55,6 +62,7 @@ def fetch_meter_data():
     save_today_data_to_csv(data_today)
 
 # 复制当日 dic 至 当日 csv
+# Copy today’s dic to today’s CSV
 def save_today_data_to_csv(data_today, filename=TODAY_CSV):
     current_date = datetime.now().strftime("%Y%m%d")
 
@@ -79,15 +87,17 @@ def save_today_data_to_csv(data_today, filename=TODAY_CSV):
     print(f"Latest data appended to {filename}")
 
 # 每日数据归档 ——————————————————————————————————————————————————————————————————
+# Daily data archiving
 
 # 将 当日dic 存储至 每日dic
+# Store today’s dic into the daily dic
 def archive_to_data_daily():
     global data_today, data_daily
 
     previous_date = int((datetime.now() - timedelta(days=1)).strftime("%Y%m%d"))
 
     for meter_id, readings in data_today.items():
-        if readings:  # 确保 readings 不是空字典
+        if readings:
             last_timestamp = max(readings.keys())  # last_timestamp = 2330
             last_reading = readings[last_timestamp]
             
@@ -98,6 +108,8 @@ def archive_to_data_daily():
 
     print("Daily data archived:", data_daily)
 
+# 将 每日dic 存储至 每日csv
+# Store daily dic into the daily csv
 def archive_to_csv_daily():
     global data_today, data_daily
 
@@ -134,6 +146,7 @@ def archive_to_csv_daily():
     print(f"Daily data archived and saved to {DAILY_CSV}")
 
 # 清空 当日dic & 当日csv
+# Clear today’s dic & today’s CSV
 def clear_data_today():
     global data_today
     data_today.clear()
@@ -146,10 +159,10 @@ def clear_data_today():
 
 
 # 恢复数据 ——————————————————————————————————————————————————————————————————————
-
+# Restore data to dic from csv (if needed)
 
 def restore_today():
-    global data_today  # 确保修改的是全局变量
+    global data_today
 
     df = pd.read_csv(TODAY_CSV, dtype={"timestamp": str})
 
@@ -184,6 +197,7 @@ def restore_daily():
 
 
 # 定时任务 ——————————————————————————————————————————————————————————————————————
+# Scheduled task
 
 def start_scheduler():
 
@@ -193,6 +207,8 @@ def start_scheduler():
 
 
     # 需要测试的话，可将数字改为接下来即将到来的分钟，如：
+    # If testing is needed, you can change the number to the upcoming minute:
+
 #    schedule.every().hour.at(":00").do(fetch_meter_data)
 #    schedule.every().hour.at(":01").do(fetch_meter_data)
 #    schedule.every().hour.at(":01").do(archive_to_data_daily)
@@ -200,7 +216,7 @@ def start_scheduler():
 
     while server_running:
         schedule.run_pending()
-        time.sleep(10)  # 每10秒检查一次
+        time.sleep(10)  # 每10秒检查一次 check per 10s
 
 def start_background_scheduler():
 
@@ -208,7 +224,7 @@ def start_background_scheduler():
     scheduler_thread.start()
 
 # 当日数据查询 api ———————————————————————————————————————————————————————————————
-
+# API for querying today’s data
 
 @app.route("/get_today_data/<meter_id>", methods=["GET"])
 def get_today_data(meter_id):
@@ -234,6 +250,7 @@ def get_today_data(meter_id):
         }), 404
 
 # 每日数据查询 api ———————————————————————————————————————————————————————————————
+# API for querying daily data
 
 @app.route("/get_daily_data/<meter_id>", methods=["GET"])
 def get_daily_data(meter_id):
@@ -246,7 +263,7 @@ def get_daily_data(meter_id):
             return jsonify({"error": "Missing required parameter: date"}), 400  # 缺少参数
 
         try:
-            query_date = int(query_date)  # 确保日期是整数格式 (YYYYMMDD)
+            query_date = int(query_date)
         except ValueError:
             return jsonify({"error": "Invalid date format. Use YYYYMMDD"}), 400  # 日期格式错误
 
@@ -268,6 +285,69 @@ def get_daily_data(meter_id):
             "date": query_date,
             "message": "Server is busy."
         }), 404
+
+# creat test data ——————————————————————————————————————————————————————————————
+import random
+
+def create_test_data():
+    meter_ids = load_meter_ids()
+    start_date = datetime.date(2024, 12, 31)
+    end_date = datetime.date.today() - datetime.timedelta(days=1)
+    num_days = (end_date - start_date).days + 1
+    
+    # generate daily data
+    daily_data = [["date"] + meter_ids]
+    initial_values = {meter: random.uniform(100, 500) for meter in meter_ids}
+    
+    for i in range(num_days):
+        date = (start_date + datetime.timedelta(days=i)).strftime("%Y-%m-%d")
+        row = [date] + [round(initial_values[meter] + i * random.uniform(18, 22), 2) for meter in meter_ids]
+        daily_data.append(row)
+    
+    with open(DAILY_CSV, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(daily_data)
+    
+    # generate today's data
+    last_day_values = {meter: row[i + 1] for i, meter in enumerate(meter_ids)}
+    today_date = datetime.date.today().strftime("%Y%m%d")
+    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
+    now = datetime.datetime.now()
+    last_half_hour = now.replace(minute=(now.minute // 30) * 30, second=0, microsecond=0)
+    print(last_half_hour)
+    print(start_time)
+    num_intervals = (last_half_hour - start_time).seconds // 1800
+    print(num_intervals)
+    
+    today_data = [["date", "timestamp"] + meter_ids]
+    increment_per_step = {meter: (random.uniform(18, 22) / num_intervals) for meter in meter_ids}
+    
+    timestamps = []
+    for hour in range((num_intervals + 1) // 2 + 1):
+        timestamps.append(hour * 100)
+        timestamps.append(hour * 100 + 30)
+        print(timestamps)
+
+    for i, timestamp in enumerate(timestamps):
+        row = [today_date, timestamp] + [
+            round(last_day_values[meter] + i * increment_per_step[meter], 2) for meter in meter_ids
+        ]
+        today_data.append(row)
+    
+    # updata real-time meter readings
+    with open(TODAY_CSV, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(today_data)
+    
+        meter_index = {meter: i+2 for i, meter in enumerate(meter_ids)}
+    
+    latest_row = today_data[-1]
+    meter_index = {meter: i+2 for i, meter in enumerate(meter_ids)}
+    
+    for meter in meter_ids:
+        meter_file_path = os.path.join(METER_DATA_FOLDER, f"meter_{meter}.txt")
+        with open(meter_file_path, "w") as meter_file:
+            meter_file.write(str(latest_row[meter_index[meter]]) + "\n")
 
 # batch jobs ———————————————————————————————————————————————————————————————————
 
@@ -291,21 +371,21 @@ def stop_server():
     global acceptAPI
     acceptAPI = False
     batchJobs()
-    time.sleep(8)
+    time.sleep(8) # time for demonstrating the stopserver page
     acceptAPI = True
 
+# 返回服务器是否接受 API 请求
+# return whether the server accepts API requests
 @app.route("/api/server_status", methods=["GET"])
 def get_server_status():
-    """ 返回服务器是否接受 API 请求 """
     return jsonify({"acceptAPI": acceptAPI})
 
-# 主程序 ————————————————————————————————————————————————————————————————————————
+# main ————————————————————————————————————————————————————————————————————————
 
-
-# **7️⃣ 启动 Flask 服务器**
 if __name__ == "__main__":
-    restore_today() #从csv恢复当日数据
-    restore_daily() #从csv恢复每日数据
+    create_test_data()
+    restore_today()    # restore today's data
+    restore_daily()    # restore daily data
     print(data_today)
     print(data_daily)
     start_background_scheduler()

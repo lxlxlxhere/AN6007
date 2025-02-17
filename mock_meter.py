@@ -7,29 +7,37 @@ from datetime import datetime
 USER_DATA_FILE = "users.json"
 METERS_FOLDER = "meter_data"
 
+# 读取用户信息
+# load users' info
+
 def load_users():
-    """ 读取已注册的用户列表 """
     if os.path.exists(USER_DATA_FILE):
         with open(USER_DATA_FILE, "r") as f:
             return json.load(f)
     return {}
 
 # 读取或创建电表读数 txt
+# Read or create meter reading TXT
+
 def load_total_kwh(meter_file):
 
     try:
         with open(meter_file, "r") as f:
             return float(f.read().strip())
     except:
-        return 0.0  # 否则返回 0.0
+        return 0.0
 
 # 覆写电表读数
+# Overwrite meter readings
+
 def save_total_kwh(meter_file, kwh):
 
     with open(meter_file, "w") as f:
-        f.write(f"{kwh:.8f}")  # 直接覆盖旧数据
+        f.write(f"{kwh:.8f}")
 
 # 随机生成电量消耗
+# Randomly generate power consumption
+
 def get_next_usage():
 
     return round(random.uniform(0.1, 1.0)/1000000, 8)
@@ -40,23 +48,55 @@ def run_meters():
     print("Mock Meter started...\n")
 
     while True:
-        users = load_users()  # **每次循环都重新加载用户**
+        users = load_users()
         meters = {u: os.path.join(METERS_FOLDER, f"meter_{data['meter_id']}.txt") for u, data in users.items()}
 
         print(f"Now updating {len(meters)} meters...\n")
 
         for username, meter_file in meters.items():
-            if not os.path.exists(meter_file):  # 如果文件不存在，则创建并初始化
+            if not os.path.exists(meter_file):
                 with open(meter_file, "w") as f:
-                    f.write("0.00")  # 初始总用电量为 0.00
+                    f.write("0.00")
 
-            kwh = load_total_kwh(meter_file)  # 读取当前总电量
-            usage = get_next_usage()  # 计算本次新增用电
-            kwh += usage  # 叠加用电量
-            save_total_kwh(meter_file, kwh)  # 覆盖旧数据
+            kwh = load_total_kwh(meter_file)
+            usage = get_next_usage()
+            kwh += usage
+            save_total_kwh(meter_file, kwh)
             print(f"{datetime.now().strftime('%H:%M:%S')} - {username}: {kwh:.8f} kWh")
 
-        time.sleep(1)  # 每秒钟更新一次
+        time.sleep(1)
+
+
+# 电表数据输出API
+# Meter data output API
+
+from flask import Flask, jsonify
+import os
+
+app = Flask(__name__)
+
+def read_meter_data(meter_id):
+
+    meter_file = os.path.join(METERS_FOLDER, f"meter_{meter_id}.txt")
+    
+    with open(meter_file, "r") as f:
+        return float(f.read().strip())
+
+
+@app.route("/get_meter_data/<meter_id>", methods=["GET"])
+def get_meter_data(meter_id):
+
+    reading = read_meter_data(meter_id)
+
+    return jsonify({
+        "meter_id": meter_id,
+        "reading_kwh": reading
+    })
+
+import threading
 
 if __name__ == "__main__":
-    run_meters()
+    meter_thread = threading.Thread(target=run_meters, daemon=True)
+    meter_thread.start()
+    app.run(port=5001, debug=True)
+    
