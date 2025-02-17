@@ -1,8 +1,10 @@
 The execution order is as follows:
 
-1. mock_meter.py
-2. meter_api.py
-3. store_readings.py
-4. app.py
+1. store_readings.py (include generating test data)
+2. mock_meter.py (include generator and API)
+3. app.py
 
-"_original" means that it is the last version, used only as a backup.
+store_readings.py includes:
+    1. create test data
+    2. restore data to dic from csv
+    3. archive while server stopped

@@ -67,7 +67,7 @@ def run_meters():
         time.sleep(1)
 
 
-# 电表数据输出API
+# 电表数据输出 API
 # Meter data output API
 
 from flask import Flask, jsonify

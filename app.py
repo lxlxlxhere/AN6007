@@ -13,7 +13,7 @@ app.secret_key = "secret_key"
 user_manager = UserManager()
 meter_manager = MeterManager()
 
-# ——————————————————————————————————————————
+# ——————————————————————————————————————————————
 
 @app.route('/')
 def usertype():

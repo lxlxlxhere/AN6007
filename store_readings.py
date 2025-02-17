@@ -374,7 +374,7 @@ def stop_server():
     time.sleep(8) # time for demonstrating the stopserver page
     acceptAPI = True
 
-# 返回服务器是否接受 API 请求
+# 返回 服务器是否接受 API 请求
 # return whether the server accepts API requests
 @app.route("/api/server_status", methods=["GET"])
 def get_server_status():
