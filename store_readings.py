@@ -6,8 +6,7 @@ import requests
 import time
 import threading
 import schedule
-import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta, time
 from flask import Flask, jsonify, request
 from concurrent.futures import ThreadPoolExecutor
 
@@ -58,7 +57,6 @@ def fetch_meter_data():
             if meter_id not in data_today:
                 data_today[meter_id] = {}
             data_today[meter_id][current_time] = reading
-    print(data_today)
     save_today_data_to_csv(data_today)
 
 # 复制当日 dic 至 当日 csv
@@ -198,6 +196,7 @@ def restore_daily():
 
 # 定时任务 ——————————————————————————————————————————————————————————————————————
 # Scheduled task
+import time
 
 def start_scheduler():
 
@@ -291,8 +290,8 @@ import random
 
 def create_test_data():
     meter_ids = load_meter_ids()
-    start_date = datetime.date(2024, 12, 31)
-    end_date = datetime.date.today() - datetime.timedelta(days=1)
+    start_date = datetime(2024, 12, 31)
+    end_date = datetime.today() - timedelta(days=1)
     num_days = (end_date - start_date).days + 1
     
     # generate daily data
@@ -300,7 +299,7 @@ def create_test_data():
     initial_values = {meter: random.uniform(100, 500) for meter in meter_ids}
     
     for i in range(num_days):
-        date = (start_date + datetime.timedelta(days=i)).strftime("%Y-%m-%d")
+        date = (start_date + timedelta(days=i)).strftime("%Y-%m-%d")
         row = [date] + [round(initial_values[meter] + i * random.uniform(18, 22), 2) for meter in meter_ids]
         daily_data.append(row)
     
@@ -308,16 +307,16 @@ def create_test_data():
         writer = csv.writer(f)
         writer.writerows(daily_data)
     
+    from datetime import time
     # generate today's data
     last_day_values = {meter: row[i + 1] for i, meter in enumerate(meter_ids)}
-    today_date = datetime.date.today().strftime("%Y%m%d")
-    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    now = datetime.datetime.now()
+    today_date = datetime.today().strftime("%Y%m%d")
+    start_time = datetime.combine(datetime.today(), time(0, 0))
+    now = datetime.now()
     last_half_hour = now.replace(minute=(now.minute // 30) * 30, second=0, microsecond=0)
     print(last_half_hour)
     print(start_time)
     num_intervals = (last_half_hour - start_time).seconds // 1800
-    print(num_intervals)
     
     today_data = [["date", "timestamp"] + meter_ids]
     increment_per_step = {meter: (random.uniform(18, 22) / num_intervals) for meter in meter_ids}
@@ -326,7 +325,6 @@ def create_test_data():
     for hour in range((num_intervals + 1) // 2 + 1):
         timestamps.append(hour * 100)
         timestamps.append(hour * 100 + 30)
-        print(timestamps)
 
     for i, timestamp in enumerate(timestamps):
         row = [today_date, timestamp] + [
@@ -357,7 +355,7 @@ def batchJobs():
 
     thread1 = threading.Thread(target=archive_to_csv_daily)
     thread2 = threading.Thread(target=archive_to_data_daily)
-    
+    print(data_daily)
     thread1.start()
     thread2.start()
     
@@ -365,6 +363,7 @@ def batchJobs():
     thread2.join()
 
 # stop server ——————————————————————————————————————————————————————————————————
+import time
 
 @app.route("/stopserver", methods=["GET"])
 def stop_server():
@@ -373,6 +372,7 @@ def stop_server():
     batchJobs()
     time.sleep(8) # time for demonstrating the stopserver page
     acceptAPI = True
+    return jsonify({"message": "Server is stopping", "status": "success"})
 
 # 返回 服务器是否接受 API 请求
 # return whether the server accepts API requests
