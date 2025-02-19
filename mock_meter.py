@@ -2,11 +2,12 @@ import time
 import random
 import json
 import os
+import requests
 from datetime import datetime
 
 USER_DATA_FILE = "users.json"
 METERS_FOLDER = "meter_data"
-
+USER_API_URL = "http://127.0.0.1:5000/meter_ids"
 
 # load user info
 
@@ -39,7 +40,28 @@ def save_total_kwh(meter_file, kwh):
 
 def get_next_usage():
 
-    return round(random.uniform(0.1, 1.0)/1000000, 8)
+    return round(random.uniform(0.1, 1.0), 8)
+
+def load_meter_ids():
+    response = requests.get(USER_API_URL)
+    meter_ids = response.json()
+    return meter_ids
+
+def check_meter_id():
+    meter_ids = load_meter_ids()
+    users = load_users()
+    meters = {u: os.path.join(METERS_FOLDER, f"meter_{data['meter_id']}.txt") for u, data in users.items()}
+    
+    if not os.path.exists(METERS_FOLDER):
+        os.makedirs(METERS_FOLDER)
+    
+    for meter_id in meter_ids:
+        meter_file = os.path.join(METERS_FOLDER, f"meter_{meter_id}.txt")
+        if not os.path.exists(meter_file): 
+            with open(meter_file, "w") as f:
+                f.write("0.0")
+            print(f"Created missing meter file: {meter_file}")
+
 
 def run_meters():
     
@@ -48,6 +70,7 @@ def run_meters():
 
     while True:
         users = load_users()
+        check_meter_id()
         meters = {u: os.path.join(METERS_FOLDER, f"meter_{data['meter_id']}.txt") for u, data in users.items()}
 
         print(f"Now updating {len(meters)} meters...\n")
@@ -95,9 +118,15 @@ def get_meter_data(meter_id):
         "reading_kwh": reading
     })
 
+
 import threading
 
 if __name__ == "__main__":
-    meter_thread = threading.Thread(target=run_meters, daemon=True)
-    meter_thread.start()
+    # 在后台线程中运行 run_meters()
+    threading.Thread(target=run_meters, daemon=True).start()
+
+    # 运行 Flask 服务器
     app.run(port=5001, debug=True)
+    
+    
+
