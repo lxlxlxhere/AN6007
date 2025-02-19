@@ -6,8 +6,7 @@ import requests
 import time
 import threading
 import schedule
-import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta, time
 from flask import Flask, jsonify, request
 from concurrent.futures import ThreadPoolExecutor
 
@@ -30,12 +29,9 @@ executor = ThreadPoolExecutor(max_workers=5)
 # 读取所有已注册 meter_id ———————————————————————————————————————————————————————
 # Retrieve all registered meter_id
 def load_meter_ids():
-
     with open(USERS_DATA_FILE, "r") as f:
-        users = json.load(f)
-        meter_ids = [data["meter_id"] for data in users.values()] 
+        
         return meter_ids
-
 
 # 每半小时读取数据 ---------------------------------------------------------------
 # Read data every half hour
@@ -43,22 +39,24 @@ def load_meter_ids():
 # 读取数据至 当日dic
 # Read data into today’s dic
 def fetch_meter_data():
-
     global data_today
     meter_ids = load_meter_ids()
     current_time = datetime.now().strftime("%H%M")
     print(current_time)
     print(meter_ids)
 
-    for meter_id in meter_ids:
-        response = requests.get(f"{METER_API_URL}{meter_id}")
-        reading = response.json().get("reading_kwh", None)
-        print(meter_id, reading)
-        if reading is not None:
-            if meter_id not in data_today:
-                data_today[meter_id] = {}
-            data_today[meter_id][current_time] = reading
-    print(data_today)
+    futures = [executor.submit(fetch_meter_data_for_id, meter_id, current_time) for meter_id in meter_ids]
+    for future in futures:
+        future.result()  # Wait for all tasks to complete
+
+def fetch_meter_data_for_id(meter_id, current_time):
+    response = requests.get(f"{METER_API_URL}{meter_id}")
+    reading = response.json().get("reading_kwh", None)
+    print(meter_id, reading)
+    if reading is not None:
+        if meter_id not in data_today:
+            data_today[meter_id] = {}
+        data_today[meter_id][current_time] = reading
     save_today_data_to_csv(data_today)
 
 # 复制当日 dic 至 当日 csv
@@ -156,8 +154,6 @@ def clear_data_today():
         f.write("date,timestamp\n")
     print("electricity_data_today.csv has been cleared, only headers remain.")
 
-
-
 # 恢复数据 ——————————————————————————————————————————————————————————————————————
 # Restore data to dic from csv (if needed)
 
@@ -171,7 +167,7 @@ def restore_today():
     for _, row in df.iterrows():
         timestamp = str(row["timestamp"])
         for meter_id in df.columns[2:]:
-            if pd.notna(row[meter_id]):
+           na(row[meter_id]):
                 if meter_id not in data_today:
                     data_today[meter_id] = {}
                 data_today[meter_id][timestamp] = float(row[meter_id])
@@ -186,25 +182,21 @@ def restore_daily():
     data_daily = {}
 
     for _, row in df.iterrows():
-        date = int(row["date"].replace("-", ""))
-        for meter_id in df.columns[1:]:
-            if pd.notna(row[meter_id]):
+        date = int(row["date"].replace("-",na(row[meter_id]):
                 if meter_id not in data_daily:
                     data_daily[meter_id] = {}
                 data_daily[meter_id][date] = row[meter_id]
 
     print(" Data restored from electricity_data_daily.csv to data_daily")
 
-
 # 定时任务 ——————————————————————————————————————————————————————————————————————
 # Scheduled task
+import time
 
 def start_scheduler():
-
     schedule.every().hour.at(":00").do(fetch_meter_data)
     schedule.every().hour.at(":30").do(fetch_meter_data)
-    schedule.every().hour.at("00:00").do(stop_server)
-
+   ().hour.at("00:00").do(stop_server)
 
     # 需要测试的话，可将数字改为接下来即将到来的分钟，如：
     # If testing is needed, you can change the number to the upcoming minute:
@@ -214,12 +206,9 @@ def start_scheduler():
 #    schedule.every().hour.at(":01").do(archive_to_data_daily)
 #    schedule.every().hour.at(":01").do(archive_to_csv_daily)
 
-    while server_running:
-        schedule.run_pending()
-        time.sleep(10)  # 每10秒检查一次 check per 10s
+    while server_running 10s
 
 def start_background_scheduler():
-
     scheduler_thread = threading.Thread(target=start_scheduler, daemon=True)
     scheduler_thread.start()
 
@@ -246,7 +235,7 @@ def get_today_data(meter_id):
     else:
         return jsonify({
             "meter_id": meter_id,
-            "message": "Server is busy."
+           Server is busy."
         }), 404
 
 # 每日数据查询 api ———————————————————————————————————————————————————————————————
@@ -256,7 +245,6 @@ def get_today_data(meter_id):
 def get_daily_data(meter_id):
     global acceptAPI
     if acceptAPI:
-
         query_date = request.args.get("date")
 
         if not query_date:
@@ -291,8 +279,8 @@ import random
 
 def create_test_data():
     meter_ids = load_meter_ids()
-    start_date = datetime.date(2024, 12, 31)
-    end_date = datetime.date.today() - datetime.timedelta(days=1)
+    start_date = datetime(2024, 12, 31)
+   1)
     num_days = (end_date - start_date).days + 1
     
     # generate daily data
@@ -300,7 +288,7 @@ def create_test_data():
     initial_values = {meter: random.uniform(100, 500) for meter in meter_ids}
     
     for i in range(num_days):
-        date = (start_date + datetime.timedelta(days=i)).strftime("%Y-%m-%d")
+        date = (start_date + timedelta(days=i)).strftime("%Y-%m-%d")
         row = [date] + [round(initial_values[meter] + i * random.uniform(18, 22), 2) for meter in meter_ids]
         daily_data.append(row)
     
@@ -308,16 +296,16 @@ def create_test_data():
         writer = csv.writer(f)
         writer.writerows(daily_data)
     
+    from datetime import time
     # generate today's data
     last_day_values = {meter: row[i + 1] for i, meter in enumerate(meter_ids)}
-    today_date = datetime.date.today().strftime("%Y%m%d")
-    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    now = datetime.datetime.now()
+    today_date = datetime.today().strftime("%Y%m%d")
+    start_time = datetime.combine(datetime.today(), time(0, 0))
+    now = datetime.now()
     last_half_hour = now.replace(minute=(now.minute // 30) * 30, second=0, microsecond=0)
     print(last_half_hour)
     print(start_time)
     num_intervals = (last_half_hour - start_time).seconds // 1800
-    print(num_intervals)
     
     today_data = [["date", "timestamp"] + meter_ids]
     increment_per_step = {meter: (random.uniform(18, 22) / num_intervals) for meter in meter_ids}
@@ -326,7 +314,6 @@ def create_test_data():
     for hour in range((num_intervals + 1) // 2 + 1):
         timestamps.append(hour * 100)
         timestamps.append(hour * 100 + 30)
-        print(timestamps)
 
     for i, timestamp in enumerate(timestamps):
         row = [today_date, timestamp] + [
@@ -339,8 +326,6 @@ def create_test_data():
         writer = csv.writer(f)
         writer.writerows(today_data)
     
-        meter_index = {meter: i+2 for i, meter in enumerate(meter_ids)}
-    
     latest_row = today_data[-1]
     meter_index = {meter: i+2 for i, meter in enumerate(meter_ids)}
     
@@ -352,19 +337,15 @@ def create_test_data():
 # batch jobs ———————————————————————————————————————————————————————————————————
 
 def batchJobs():
+    print("Running batch jobs...")
 
-    print(" Running batch jobs...")
-
-    thread1 = threading.Thread(target=archive_to_csv_daily)
-    thread2 = threading.Thread(target=archive_to_data_daily)
-    
-    thread1.start()
-    thread2.start()
-    
-    thread1.join()
-    thread2.join()
-
-# stop server ——————————————————————————————————————————————————————————————————
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        future1 = executor.submit(archive_to_csv_daily)
+        future2 = executor.submit(archive_to_data_daily)
+        
+        # Wait for all tasks to complete
+       # stop server ——————————————————————————————————————————————————————————————————
+import time
 
 @app.route("/stopserver", methods=["GET"])
 def stop_server():
@@ -373,11 +354,11 @@ def stop_server():
     batchJobs()
     time.sleep(8) # time for demonstrating the stopserver page
     acceptAPI = True
+    return jsonify({"message": "Server is stopping", "status": "success"})
 
 # 返回 服务器是否接受 API 请求
 # return whether the server accepts API requests
-@app.route("/api/server_status", methods=["GET"])
-def get_server_status():
+@app.route("/_server_status():
     return jsonify({"acceptAPI": acceptAPI})
 
 # main ————————————————————————————————————————————————————————————————————————
