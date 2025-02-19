@@ -18,17 +18,5 @@
     "user5": {
         "meter_id": "100000005",
         "password": "5555"
-    },
-    "user6": {
-        "password": "6666",
-        "meter_id": "100000006"
-    },
-    "user7": {
-        "password": "7777",
-        "meter_id": "100000007"
-    },
-    "8": {
-        "password": "8",
-        "meter_id": "100000008"
     }
 }
