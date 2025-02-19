@@ -7,8 +7,8 @@ from datetime import datetime
 USER_DATA_FILE = "users.json"
 METERS_FOLDER = "meter_data"
 
-# 读取用户信息
-# load users' info
+
+# load user info
 
 def load_users():
     if os.path.exists(USER_DATA_FILE):
@@ -16,7 +16,6 @@ def load_users():
             return json.load(f)
     return {}
 
-# 读取或创建电表读数 txt
 # Read or create meter reading TXT
 
 def load_total_kwh(meter_file):
@@ -27,7 +26,7 @@ def load_total_kwh(meter_file):
     except:
         return 0.0
 
-# 覆写电表读数
+
 # Overwrite meter readings
 
 def save_total_kwh(meter_file, kwh):
@@ -35,7 +34,7 @@ def save_total_kwh(meter_file, kwh):
     with open(meter_file, "w") as f:
         f.write(f"{kwh:.8f}")
 
-# 随机生成电量消耗
+
 # Randomly generate power consumption
 
 def get_next_usage():
@@ -67,7 +66,7 @@ def run_meters():
         time.sleep(1)
 
 
-# 电表数据输出 API
+
 # Meter data output API
 
 import os
