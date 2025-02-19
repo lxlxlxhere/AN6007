@@ -1,4 +1,3 @@
-# v1
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
@@ -15,10 +14,10 @@ class MeterManager:
 
     def get_past_date(self):
         now = datetime.now()
-        yesterday = (now - timedelta(days=1)).strftime("%Y%m%d")  # 昨天
-        last_weekend = (now - timedelta(days=now.weekday() + 1)).strftime("%Y%m%d")  # 上周末（上周日）
-        last_month_end = (now.replace(day=1) - timedelta(days=1)).strftime("%Y%m%d")  # 上月底
-        prev_month_end = (now.replace(day=1) - timedelta(days=1)).replace(day=1).strftime("%Y%m%d")  # 上上月底
+        yesterday = (now - timedelta(days=1)).strftime("%Y%m%d")  
+        last_weekend = (now - timedelta(days=now.weekday() + 1)).strftime("%Y%m%d")  
+        last_month_end = (now.replace(day=1) - timedelta(days=1)).strftime("%Y%m%d")  
+        prev_month_end = (now.replace(day=1) - timedelta(days=1)).replace(day=1).strftime("%Y%m%d")  
         return yesterday, last_weekend, last_month_end, prev_month_end
 
     def get_meter_data(self, meter_id, api_url, date=None):
