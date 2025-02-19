@@ -27,21 +27,21 @@ server_running = True
 
 app = Flask(__name__)
 executor = ThreadPoolExecutor(max_workers=5)
-# Use ThreadPoolExecutor to handle multiple requests concurrently
 
-# 读取所有已注册 meter_id ———————————————————————————————————————————————————————
-# Retrieve all registered meter_id
+
+
+# Retrieve registered meter_id
 
 def load_meter_ids():
     response = requests.get(USER_API_URL)
     meter_ids = response.json()
     return meter_ids
 
-# 每半小时读取数据 ---------------------------------------------------------------
+
 # Read data every half hour
 
-# 读取数据至 当日dic
-# Read data into today’s dic
+
+# Read data into today dict
 def fetch_meter_data():
 
     global data_today
@@ -60,8 +60,8 @@ def fetch_meter_data():
             data_today[meter_id][current_time] = reading
     save_today_data_to_csv(data_today)
 
-# 复制当日 dic 至 当日 csv
-# Copy today’s dic to today’s CSV
+
+# Copy today dict to today CSV
 def save_today_data_to_csv(data_today, filename=TODAY_CSV):
     current_date = datetime.now().strftime("%Y%m%d")
 
@@ -85,11 +85,11 @@ def save_today_data_to_csv(data_today, filename=TODAY_CSV):
     df.to_csv(filename, index=False)
     print(f"Latest data appended to {filename}")
 
-# 每日数据归档 ——————————————————————————————————————————————————————————————————
-# Daily data archiving
 
-# 将 当日dic 存储至 每日dic
-# Store today’s dic into the daily dic
+
+
+
+# Store today’s dict into the daily dict
 def archive_to_data_daily():
     global data_today, data_daily
 
@@ -108,8 +108,8 @@ def archive_to_data_daily():
 
     print("Daily data archived:", data_daily)
 
-# 将 每日dic 存储至 每日csv
-# Store daily dic into the daily csv
+
+# Store daily dict into the daily csv
 def archive_to_csv_daily():
     global data_today, data_daily
 
@@ -125,8 +125,8 @@ def archive_to_csv_daily():
     for meter_id, readings in data_today.items():
         if readings:
             last_timestamp = max(readings.keys())  # last_timestamp = 2330
-            last_reading = readings[last_timestamp]  # 读取最新读数
-            readings_2330[meter_id] = last_reading  # 存入字典
+            last_reading = readings[last_timestamp]  
+            readings_2330[meter_id] = last_reading  
 
             if meter_id not in data_daily:
                 data_daily[meter_id] = {}
@@ -146,7 +146,7 @@ def archive_to_csv_daily():
 
     print(f"Daily data archived and saved to {DAILY_CSV}")
 
-# 清空 当日dic & 当日csv
+
 # Clear today’s dic & today’s CSV
 def clear_data_today():
     global data_today
@@ -159,7 +159,7 @@ def clear_data_today():
 
 
 
-# 恢复数据 ——————————————————————————————————————————————————————————————————————
+
 # Restore data to dic from csv (if needed)
 
 def restore_today():
@@ -199,8 +199,8 @@ def restore_daily():
     print(" Data restored from electricity_data_daily.csv to data_daily")
 
 
-# 定时任务 ——————————————————————————————————————————————————————————————————————
-# Scheduled task
+
+# Schedule tasks
 import time
 
 def start_scheduler():
@@ -210,7 +210,7 @@ def start_scheduler():
     schedule.every().hour.at("00:00").do(stop_server)
 
 
-    # 需要测试的话，可将数字改为接下来即将到来的分钟，如：
+   
     # If testing is needed, you can change the number to the upcoming minute:
 
 #    schedule.every().hour.at(":00").do(fetch_meter_data)
@@ -220,14 +220,13 @@ def start_scheduler():
 
     while server_running:
         schedule.run_pending()
-        time.sleep(10)  # 每10秒检查一次 check per 10s
-
+        time.sleep(10)  
 def start_background_scheduler():
 
     scheduler_thread = threading.Thread(target=start_scheduler, daemon=True)
     scheduler_thread.start()
 
-# 当日数据查询 api ———————————————————————————————————————————————————————————————
+#
 # API for querying today’s data
 
 @app.route("/get_today_data/<meter_id>", methods=["GET"])
@@ -235,8 +234,8 @@ def get_today_data(meter_id):
     global acceptAPI
     if acceptAPI:
         if meter_id in data_today:
-            latest_timestamp = max(data_today[meter_id].keys())  # 获取最新时间戳
-            latest_reading = data_today[meter_id][latest_timestamp]  # 获取最新读数
+            latest_timestamp = max(data_today[meter_id].keys())  
+            latest_reading = data_today[meter_id][latest_timestamp] 
             return jsonify({
                 "meter_id": meter_id,
                 "timestamp": latest_timestamp,
@@ -253,7 +252,7 @@ def get_today_data(meter_id):
             "message": "Server is busy."
         }), 404
 
-# 每日数据查询 api ———————————————————————————————————————————————————————————————
+
 # API for querying daily data
 
 @app.route("/get_daily_data/<meter_id>", methods=["GET"])
@@ -264,12 +263,12 @@ def get_daily_data(meter_id):
         query_date = request.args.get("date")
 
         if not query_date:
-            return jsonify({"error": "Missing required parameter: date"}), 400  # 缺少参数
+            return jsonify({"error": "Missing required parameter: date"}), 400  
 
         try:
             query_date = int(query_date)
         except ValueError:
-            return jsonify({"error": "Invalid date format. Use YYYYMMDD"}), 400  # 日期格式错误
+            return jsonify({"error": "Invalid date format. Use YYYYMMDD"}), 400  
 
         if meter_id in data_daily and query_date in data_daily[meter_id]:
             return jsonify({
@@ -290,7 +289,7 @@ def get_daily_data(meter_id):
             "message": "Server is busy."
         }), 404
 
-# creat test data ——————————————————————————————————————————————————————————————
+# creat test data 
 import random
 
 def create_test_data():
@@ -352,7 +351,7 @@ def create_test_data():
         with open(meter_file_path, "w") as meter_file:
             meter_file.write(str(latest_row[meter_index[meter]]) + "\n")
 
-# batch jobs ———————————————————————————————————————————————————————————————————
+# batch jobs 
 
 def batchJobs():
 
@@ -374,8 +373,8 @@ def batchJobs():
     thread1.join()
     thread2.join()
 
-# stop server ——————————————————————————————————————————————————————————————————
-import time
+# stop server
+
 
 @app.route("/stopserver", methods=["GET"])
 def stop_server():
@@ -386,7 +385,7 @@ def stop_server():
     acceptAPI = True
     return jsonify({"message": "Server is stopping", "status": "success"})
 
-# 返回 服务器是否接受 API 请求
+
 # return whether the server accepts API requests
 @app.route("/api/server_status", methods=["GET"])
 def get_server_status():
