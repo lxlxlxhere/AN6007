@@ -54,9 +54,9 @@ class MeterManager:
         last_month_usage = max(0, last_month_end_reading - prev_month_end_reading)
 
         return {
-            "recent_half_hour_usage": round(recent_half_hour_usage, 8),
-            "today_usage": round(today_usage, 8),
-            "week_usage": round(week_usage, 8),
-            "month_usage": round(month_usage, 8),
-            "last_month_usage": round(last_month_usage, 8)
+            "recent_half_hour_usage": round(recent_half_hour_usage, 4),
+            "today_usage": round(today_usage, 4),
+            "week_usage": round(week_usage, 4),
+            "month_usage": round(month_usage, 4),
+            "last_month_usage": round(last_month_usage, 4)
         }
