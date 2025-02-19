@@ -16,6 +16,7 @@ class MeterManager:
         now = datetime.now()
         yesterday = (now - timedelta(days=1)).strftime("%Y%m%d")  # 昨天
         last_weekend = (now - timedelta(days=now.weekday() + 1)).strftime("%Y%m%d")  # 上周末（上周日）
+        print(last_weekend)
         last_month_end = (now.replace(day=1) - timedelta(days=1)).strftime("%Y%m%d")  # 上月底
         prev_month_end = (now.replace(day=1) - timedelta(days=1)).replace(day=1).strftime("%Y%m%d")  # 上上月底
         return yesterday, last_weekend, last_month_end, prev_month_end
@@ -45,11 +46,13 @@ class MeterManager:
 
         yesterday_reading = self.get_meter_data(meter_id, METER_DAILY_API, yesterday)
         last_weekend_reading = self.get_meter_data(meter_id, METER_DAILY_API, last_weekend)
+        print(last_weekend_reading)
         last_month_end_reading = self.get_meter_data(meter_id, METER_DAILY_API, last_month_end)
         prev_month_end_reading = self.get_meter_data(meter_id, METER_DAILY_API, prev_month_end)
 
         today_usage = max(0, current_reading - yesterday_reading)
         week_usage = max(0, current_reading - last_weekend_reading)
+        print(week_usage)
         month_usage = max(0, current_reading - last_month_end_reading)
         last_month_usage = max(0, last_month_end_reading - prev_month_end_reading)
 
