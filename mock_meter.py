@@ -70,10 +70,12 @@ def run_meters():
 # 电表数据输出 API
 # Meter data output API
 
-from flask import Flask, jsonify
 import os
+from flask import Flask, jsonify
+from concurrent.futures import ThreadPoolExecutor
 
 app = Flask(__name__)
+executor = ThreadPoolExecutor(max_workers=5)
 
 def read_meter_data(meter_id):
 
@@ -86,7 +88,8 @@ def read_meter_data(meter_id):
 @app.route("/get_meter_data/<meter_id>", methods=["GET"])
 def get_meter_data(meter_id):
 
-    reading = read_meter_data(meter_id)
+    future = executor.submit(read_meter_data, meter_id)
+    reading = future.result()
 
     return jsonify({
         "meter_id": meter_id,
@@ -99,4 +102,3 @@ if __name__ == "__main__":
     meter_thread = threading.Thread(target=run_meters, daemon=True)
     meter_thread.start()
     app.run(port=5001, debug=True)
-    

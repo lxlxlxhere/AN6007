@@ -6,10 +6,12 @@ import requests
 import time
 import threading
 import schedule
+import requests
 from datetime import datetime, timedelta, time
 from flask import Flask, jsonify, request
 from concurrent.futures import ThreadPoolExecutor
 
+USER_API_URL = "http://127.0.0.1:5000/meter_ids"
 METER_API_URL = "http://127.0.0.1:5001/get_meter_data/"
 METER_DATA_FOLDER = "meter_data"
 USERS_DATA_FILE = "users.json"
@@ -28,13 +30,11 @@ executor = ThreadPoolExecutor(max_workers=5)
 
 # 读取所有已注册 meter_id ———————————————————————————————————————————————————————
 # Retrieve all registered meter_id
+
 def load_meter_ids():
-
-    with open(USERS_DATA_FILE, "r") as f:
-        users = json.load(f)
-        meter_ids = [data["meter_id"] for data in users.values()] 
-        return meter_ids
-
+    response = requests.get(USER_API_URL)
+    meter_ids = response.json()
+    return meter_ids
 
 # 每半小时读取数据 ---------------------------------------------------------------
 # Read data every half hour
@@ -92,7 +92,8 @@ def save_today_data_to_csv(data_today, filename=TODAY_CSV):
 def archive_to_data_daily():
     global data_today, data_daily
 
-    previous_date = int((datetime.now() - timedelta(days=1)).strftime("%Y%m%d"))
+#    previous_date = int((datetime.now() - timedelta(days=1)).strftime("%Y%m%d"))
+    previous_date = int((datetime.now()).strftime("%Y%m%d"))
 
     for meter_id, readings in data_today.items():
         if readings:
@@ -111,7 +112,8 @@ def archive_to_data_daily():
 def archive_to_csv_daily():
     global data_today, data_daily
 
-    previous_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+#    previous_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    previous_date = (datetime.now().strftime("%Y%m%d"))
 
     if os.path.exists(DAILY_CSV):
         df = pd.read_csv(DAILY_CSV)
@@ -127,7 +129,7 @@ def archive_to_csv_daily():
 
             if meter_id not in data_daily:
                 data_daily[meter_id] = {}
-            data_daily[meter_id][int(previous_date.replace("-", ""))] = last_reading
+            data_daily[meter_id][int(previous_date)] = last_reading
 
     for meter_id in readings_2330.keys():
         if meter_id not in df.columns:
@@ -178,18 +180,20 @@ def restore_today():
 
 def restore_daily():
     global data_daily
-
-    df = pd.read_csv(DAILY_CSV)
-
     data_daily = {}
 
-    for _, row in df.iterrows():
-        date = int(row["date"].replace("-", ""))
-        for meter_id in df.columns[1:]:
-            if pd.notna(row[meter_id]):
-                if meter_id not in data_daily:
-                    data_daily[meter_id] = {}
-                data_daily[meter_id][date] = row[meter_id]
+    with open(DAILY_CSV, "r", newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        header = next(reader)
+
+        for row in reader:
+            date = int(row[0].replace("-", ""))
+            
+            for i, meter_id in enumerate(header[1:], start=1):
+                if row[i].strip():
+                    if meter_id not in data_daily:
+                        data_daily[meter_id] = {}
+                    data_daily[meter_id][date] = float(row[i])
 
     print(" Data restored from electricity_data_daily.csv to data_daily")
 
@@ -299,7 +303,7 @@ def create_test_data():
     initial_values = {meter: random.uniform(100, 500) for meter in meter_ids}
     
     for i in range(num_days):
-        date = (start_date + timedelta(days=i)).strftime("%Y-%m-%d")
+        date = (start_date + timedelta(days=i)).strftime("%Y%m%d")
         row = [date] + [round(initial_values[meter] + i * random.uniform(18, 22), 2) for meter in meter_ids]
         daily_data.append(row)
     
@@ -351,11 +355,18 @@ def create_test_data():
 
 def batchJobs():
 
-    print(" Running batch jobs...")
+    print("Running batch jobs...\n")
 
     thread1 = threading.Thread(target=archive_to_csv_daily)
     thread2 = threading.Thread(target=archive_to_data_daily)
+    print("data of the past day:\n")
     print(data_daily)
+    print(data_today)
+    clear_data_today()
+    print("\ndata of the past cleared\n")
+    print("data of today\n")
+    print(data_daily)
+    print(data_today)
     thread1.start()
     thread2.start()
     
